@@ -1,0 +1,26 @@
+{
+  "name": "vue-koa-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guoqing19971002/vue-koa-demo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/guoqing19971002/vue-koa-demo/issues"
+  },
+  "homepage": "https://github.com/guoqing19971002/vue-koa-demo#readme",
+  "dependencies": {
+    "@vue/cli": "^4.5.6",
+    "mysql2": "^2.2.2",
+    "sequelize": "^6.3.5",
+    "sequelize-cli": "^6.2.0"
+  }
+}
