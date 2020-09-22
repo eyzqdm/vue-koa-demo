@@ -6,14 +6,14 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER(10)
       },
       content_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.INTEGER(10),
         allowNull: false
       },
       user_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.INTEGER(10),
         allowNull: false
       },
       content: {

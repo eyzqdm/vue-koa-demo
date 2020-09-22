@@ -5,10 +5,10 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
-      type: Sequelize.INTEGER
+      type: Sequelize.INTEGER(10)
     },
     content_id: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.INTEGER(10),
       allowNull: false,
       references: {
         model: "Contents",
@@ -16,7 +16,7 @@ module.exports = (sequelize, Sequelize) => {
       }
     },
     user_id: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.INTEGER(10),
       allowNull: false,
       references: {
         model: "Users",
@@ -29,7 +29,8 @@ module.exports = (sequelize, Sequelize) => {
     },
     createdAt: {
       allowNull: false,
-      type: Sequelize.DATE
+      type: Sequelize.DATE,
+      defaultValue: 0
     },
     updatedAt: {
       allowNull: false,

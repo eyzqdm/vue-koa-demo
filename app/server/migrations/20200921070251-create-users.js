@@ -6,7 +6,7 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER(10)
       },
       username: {
         type: Sequelize.STRING(20),
@@ -25,13 +25,13 @@ module.exports = {
         type: Sequelize.DATE
       }
     }, {
-      tableName: 'users',
-      charset: 'utf8mb4',
-      collate: 'utf8mb4_bin'
+      tableName: 'users', // 表名
+      charset: 'utf8mb4', // 字符集
+      collate: 'utf8mb4_bin' // 校对方式
     }).then(() => {
       return queryInterface.addIndex('users', {
         name: 'username', // 索引名
-        unique: true,
+        unique: true,  // 索引值唯一，不允许重名
         fields: ['username'] // 关联属性
       });
     });

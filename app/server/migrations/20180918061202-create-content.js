@@ -6,10 +6,10 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER(10)
       },
       user_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.INTEGER(10),
         allowNull: false
       },
       title: {
@@ -21,7 +21,7 @@ module.exports = {
         allowNull: false
       },
       like_count: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.INTEGER(10),
         allowNull: false,
         defaultValue: 0
       },

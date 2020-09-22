@@ -19,6 +19,7 @@
   "homepage": "https://github.com/guoqing19971002/vue-koa-demo#readme",
   "dependencies": {
     "@vue/cli": "^4.5.6",
+    "md5": "^2.3.0",
     "mysql2": "^2.2.2",
     "sequelize": "^6.3.5",
     "sequelize-cli": "^6.2.0"

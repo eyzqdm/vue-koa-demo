@@ -5,10 +5,10 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
-      type: Sequelize.INTEGER
+      type: Sequelize.INTEGER(10)
     },
     user_id: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.INTEGER(10),
       allowNull: false,
       references: {
         model: "Users",
@@ -29,13 +29,14 @@ module.exports = (sequelize, Sequelize) => {
       defaultValue: 0
     },
     comment_count: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.INTEGER(10),
       allowNull: false,
       defaultValue: 0
     },
     createdAt: {
       allowNull: false,
-      type: Sequelize.DATE
+      type: Sequelize.DATE,
+      defaultValue: 0
     },
     updatedAt: {
       allowNull: false,
