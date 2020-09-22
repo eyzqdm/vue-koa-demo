@@ -7,6 +7,15 @@ const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
+// 自动导入 models 文件夹下的所有文件，比如user.js这个模型文件
+
+// 自动加载模型并执行
+// let users = require('./users');
+// let UsersModel = users(sequelize, Sequelize);
+// db[UsersModel.name] = UsersModel; // db['Users'] = UsersModel;
+
+
+// 下面通过fs自动加载所有的文件，并执行，同时生成的模型对象挂载到db对象下面，最后返回出去
 
 let sequelize;
 if (config.use_env_variable) {
