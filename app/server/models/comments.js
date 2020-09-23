@@ -18,7 +18,7 @@ module.exports = (sequelize, Sequelize) => {
     user_id: {
       type: Sequelize.INTEGER(10),
       allowNull: false,
-      references: {
+      references: { // 外键，依赖user表的id键
         model: "Users",
         key: 'id'
       }
