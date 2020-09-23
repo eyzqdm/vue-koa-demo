@@ -62,16 +62,8 @@
         </div>
 
         <ul class="pagination mb">
-            <li class="page-item disabled">
-                <span class="page-link"> &lt; </span>
-            </li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item active">
-                <span class="page-link">2</span>
-            </li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item">
-                <a class="page-link" href="#"> &gt; </a>
+            <li class="page-item " v-for="(item, index) in this.pages" :key = index >
+                <span @click="change(index)" style="margin-left:15px">{{index + 1}}</span>
             </li>
         </ul>
 
@@ -190,22 +182,44 @@ export default {
   data () {
     return {
       data: [],
-      count: 0
+      count: 0,
+      pageNum: 2,
+      pages: 0
     }
   },
   async created () {
     const res = await axios({
       method: 'get',
-      url: 'http://127.0.0.1'
+      url: '/'
     })
     if (res.data.code === 200)
     {
       this.data = res.data.data.rows
       this.count = res.data.data.count
-      console.log(this.data)
+      this.pageNum = res.data.pageNum
+      this.pages = Math.ceil(this.count / this.pageNum)
+      console.log(res.data)
+      console.log(res.data.pageNum, this.pages)
     }
+  },
+  methods: {
+      async change (e){
+       console.log(e)
+       const res = await axios.get('/', {
+            params: {
+               page: e + 1
+            }
+       })
+       if (res.data.code === 200)
+    {
+      this.data = res.data.data.rows
+    }
+      }
   }
 }
 </script>
 <style>
+li{
+    cursor: pointer;
+}
 </style>

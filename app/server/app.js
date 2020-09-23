@@ -16,6 +16,7 @@
         prefix: 'public',
         gzip: true
     });
+    let pageNum = 2;
 
     let users = await Models.Users.findAll();
    /*  let data = await Models.Users.findByPk(1, // 联合查询  查询当前用户，并查询该用户所有内容
@@ -25,17 +26,20 @@
             }
         });
         console.log(data) */
-    let data = await Models.Contents.findAndCountAll({ //  查询所有评论以及所对应的的用户3
-        limit:3, // 3条数据。第零页开始
-        offset:0,
-        include: {
-            model: Models.Users
-        }
-    })
     router.get('/', async ctx => {
+        let page = ctx.query.page || 1;
+        let offset = (page - 1) * pageNum; // 处理分页
+        let data = await Models.Contents.findAndCountAll({ //  查询所有评论以及所对应的的用户3
+            limit:2, // 每页2条数据，从第几页开始
+            offset,
+            include: {
+                model: Models.Users
+            }
+        })
         ctx.body = {
             code: 200,
-            data
+            data,
+            pageNum
         }
     });
 
