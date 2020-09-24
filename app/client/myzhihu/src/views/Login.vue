@@ -1,14 +1,8 @@
 <template><!-- 登录页面·-->
   <div class="LoginWrap">
     <a-card :bordered="true" >
-      <div class="LoginLeft">
-        <div class="Logo">
-        </div>
-        <div class="Picture">
-        </div>
-      </div>
       <div class="LoginRight">
-        <div class="LoginTitle">个人账号登陆</div>
+        <div class="LoginTitle">知否 个人账号登陆</div>
         <div class="LoginForm">
            <a-tabs default-active-key="1" >
              <a-tab-pane key="1" tab="密码登录"><!-- 密码登录页面·-->
@@ -111,7 +105,6 @@ export default {
         }
     },
     beforeCreate (){
-      this.$store.commit('upDateLoading', true)
       sessionStorage.clear()
     },
     mounted (){
@@ -184,6 +177,10 @@ export default {
             if (res.code === 0)
             {
               this.$message.success('登陆成功！')
+              sessionStorage.setItem('isLogin', 'true')
+              sessionStorage.setItem('uid', res.data.id)
+              sessionStorage.setItem('token', res.data.token)
+              console.log(res.data.token)
               this.$router.push('/home')
             }
             else {
@@ -247,41 +244,21 @@ export default {
 
 <style lang="less" scoped>
 .LoginWrap{
-    height: 542px;
-    width: 790px;
+    height: 400px;
+    width: 500px;
     position:absolute;
-    top:50%;
-    left:50%;
+    top:45%;
+    left:56%;
     margin-top: -271px;
     margin-left: -395px;
     border-width: 1px;
     border-style: solid;
     border-color: rgba(221, 221, 221, 1);
 }
-.LoginLeft{
-    float: left;
-    height: 540px;
-    background-color: rgba(247, 252, 252, 1);
-    border-right: 1px solid rgba(221, 221, 221, 1);
-    .Logo{
-     width: 178px;
-     height: 67px;
-     margin:0 auto;
-     margin-bottom:20px;
-     margin-top:50px;
-      img{
-     width: 100%;
-     }
-    }
-    .Picture{
-      width: 338px;
-      height: 343px;
-      width: 100%;
-    }
-}
+
 .LoginRight{
-    height: 540px;
-    width: 440px;
+    height: 500px;
+    width: 100%;
     float: right;
     position: relative;
 }
