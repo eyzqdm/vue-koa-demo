@@ -7,8 +7,10 @@
     const app = new koa();
     const Models = require('./models/index') // 引入模型
     const router = koaRouter();
+    const jwt = require('jsonwebtoken') // token
+    //const checkToken = require('./checkToken.js')
+    //app.use(checkToken)
     app.use(async (ctx, next)=> {
-        console.log('123')
         ctx.set('Access-Control-Allow-Origin', '*');
         ctx.set('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
         ctx.set('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
@@ -124,14 +126,74 @@
                 data: '密码错误'
             }
         }
+       /*  ctx.cookies.set('id', user.get('id'), { // 设置cookie
+            httpOnly: true // false表示当前cooki允许客户端进行js操作，为true，表示只能进行http协议传输
+        }) */
+        const token = await jwt.sign({
+            //token的创建日期
+            time: Date.now(),
+            //token的过期时间
+            timeout: Date.now() + 60000,
+            username,
+            id: user.get('id')
+        
+        // token：解析token的标识
+        }, 'token')
+
+        /* await ctx.cookies.set('username','lisa',{
+            httpOnly: false
+        }); */
         ctx.body = {
             code: 0,
             data: {
                 id: user.get('id'),
+                token,
                 msg: '登陆成功！'
             }
         }
         
+    })
+    router.post('/like', async ctx => {
+        let url = ctx.url.split('?')[0]
+        let token = await ctx.request.headers.authorization
+        console.log(token)
+        if (token !== null) {
+
+            // 如果有token的话就开始解析
+            const tokenItem = jwt.verify(token, 'token')
+            // 将token的创建的时间和过期时间结构出来
+            const { time, timeout } = tokenItem
+            // 拿到当前的时间
+            let data = new Date().getTime();
+            // 判断一下如果当前时间减去token创建时间小于或者等于token过期时间，说明还没有过期，否则过期
+            if (data - time > timeout) {
+                return ctx.body = {
+                    status: 405,
+                    message:'token 已过期，请重新登陆'
+                }     
+            } 
+        }
+        else {
+            console.log('sd爱的色放我·g')
+            return ctx.body = {
+                status: 405,
+                message:'请先登录'
+                }  
+        
+            }
+
+
+        let uid = ctx.request.body.uid
+        let commentId = ctx.request.body.commentId
+        let cookies = ctx.request.body.cookies
+        ctx.body = {
+            code: 0,
+            data: {
+                msg: '点赞成功' 
+            }
+        }
+
+
     })
 
 

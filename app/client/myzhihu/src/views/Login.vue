@@ -111,7 +111,6 @@ export default {
         }
     },
     beforeCreate (){
-      this.$store.commit('upDateLoading', true)
       sessionStorage.clear()
     },
     mounted (){
@@ -184,6 +183,10 @@ export default {
             if (res.code === 0)
             {
               this.$message.success('登陆成功！')
+              sessionStorage.setItem('isLogin', 'true')
+              sessionStorage.setItem('uid', res.data.id)
+              sessionStorage.setItem('token', res.data.token)
+              console.log(res.data.token)
               this.$router.push('/home')
             }
             else {

@@ -10,6 +10,16 @@ axios.defaults.baseURL = 'http://127.0.0.1'
 
 Vue.config.productionTip = false
 Vue.prototype.$error = notification.error
+axios.interceptors.request.use((config) => {
+  // 拦截成功.
+  console.log('拦截成功')
+  // 加token
+  config.headers.authorization = sessionStorage.getItem('token')
+  return config
+}, (err) => {
+  // 拦截失败
+  return Promise.reject(err)
+})
 Vue.use(Antd)
 Vue.use(Icon)
 Vue.use(Button)

@@ -12,9 +12,13 @@
         </div>
 
         <div class="heading text-right mb">
-            <a href="" @click.prevent = toHome()>登录</a>
+            <span href="" @click.prevent = toHome()>登录</span>
             <span> | </span>
-            <a href="" @click.prevent = toRegister()>注册</a>
+            <span href="" @click.prevent = toRegister()>注册</span>
+            <span v-if="isLogin === true">
+                <span> | </span>
+                <span  href="" @click.prevent = exit()>退出登录</span>
+            </span>
         </div>
 
         <div class="mb">
@@ -27,7 +31,7 @@
                 {{item.content}}
                 </p>
                 <footer class="text-right">
-                    <small>赞{{item.like_count}}</small>
+                    <small @click = like(item)>赞{{item.like_count}}</small>
                     <small>回复{{item.comment_count}}</small>
                     <a href="">我要回复</a>
                 </footer>
@@ -76,10 +80,12 @@ export default {
       data: [],
       count: 0,
       pageNum: 2,
-      pages: 0
+      pages: 0,
+      isLogin: false
     }
   },
   async created () {
+    sessionStorage.getItem('isLogin') === 'true' ? this.isLogin = true : this.isLogin = false
     const res = await axios({
       method: 'get',
       url: '/'
@@ -90,8 +96,6 @@ export default {
       this.count = res.data.data.count
       this.pageNum = res.data.pageNum
       this.pages = Math.ceil(this.count / this.pageNum)
-      console.log(res.data)
-      console.log(res.data.pageNum, this.pages)
     }
   },
   methods: {
@@ -111,6 +115,23 @@ export default {
       },
       toRegister (){
           this.$router.push('/register')
+      },
+      exit (){
+          this.isLogin = false
+          sessionStorage.clear()
+          this.$message.success('已退出登录')
+      },
+     async like (e){
+          console.log(e.id, sessionStorage.getItem('uid'))
+           const res = await axios.post('/like', {
+               uid: sessionStorage.getItem('uid'),
+               commentId: e.id
+       })
+       console.log(res)
+      /*  if (res.data.code === 200)
+        {
+        this.data = res.data.data.rows
+        } */
       }
   }
 
