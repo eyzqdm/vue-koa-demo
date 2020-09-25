@@ -12,12 +12,12 @@
         </div>
 
         <div class="heading text-right mb">
-            <span href="" @click.prevent = toHome()>登录</span>
+            <a-tag href="" @click.prevent = toHome()>登录</a-tag>
             <span> | </span>
-            <span href="" @click.prevent = toRegister()>注册</span>
+            <a-tag href="" @click.prevent = toRegister()>注册</a-tag>
             <span v-if="isLogin === true">
                 <span> | </span>
-                <span  href="" @click.prevent = exit()>退出登录</span>
+                <a-tag  href="" @click.prevent = exit()>退出登录</a-tag>
             </span>
         </div>
 
@@ -31,9 +31,9 @@
                 {{item.content}}
                 </p>
                 <footer class="text-right">
-                    <small @click = like(item)>赞{{item.like_count}}</small>
-                    <small>回复{{item.comment_count}}</small>
-                    <a href="">我要回复</a>
+                    <a-tag color="#2db7f5" @click = like(item)>赞{{item.like_count}}</a-tag>
+                    <a-tag color="#87d068" @click = showComments(item)>查看评论{{item.comment_count}}</a-tag>
+                    <a-tag color="#108ee9">我要评论</a-tag>
                 </footer>
             </div>
         </div>
@@ -43,35 +43,24 @@
                 <span @click="change(index)" style="margin-left:15px">{{index + 1}}</span>
             </li>
         </ul>
-        <div class="modal" style="display: -block">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">xxxxxxxxxx</h5>
-                            <button type="button" class="close">
-                                <span>&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <!-- 回复 -->
-                            <form>
-                                <div class="form-group row">
-                                    <div class="col-md-12">
-                                        <textarea class="form-control" id="username" placeholder="回复内容……" cols="30" rows="10"></textarea>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary">回复</button>
-                            <button type="button" class="btn btn-secondary">取消</button>
-                        </div>
-                    </div>
-                </div>
+        <div>
+            <a-button type="primary" @click="publish">发布内容</a-button>
+        </div>
+         <a-modal v-model="isPublish" title="发布内容" @ok="submit" cancelText="取消" okText="确定">
+           <div>标题</div>
+           <div style="margin-bottom:10px"><a-input placeholder="请输入标题" v-model="myTitle" /></div>
+           <div>内容</div>
+           <a-textarea placeholder="请输入内容" :rows="4" v-model="myValue" />
+        </a-modal>
+        <a-modal v-model="isCommentsShow" title="所有评论"  :footer="null">
+            <div v-for="(item,index) in commentsList" :key = index>
+                <span>用户: {{item.user_id}}</span>
+                <span>{{item.content}}</span>
             </div>
+            <a-button type="primary">我要评论</a-button>
+        </a-modal>
     </div>
 </template>
-
 <script>
 import axios from 'axios'
 export default {
@@ -79,9 +68,14 @@ export default {
     return {
       data: [],
       count: 0,
-      pageNum: 2,
+      pageNum: 3,
       pages: 0,
-      isLogin: false
+      isLogin: false,
+      isPublish: false,
+      myValue: '',
+      myTitle: '',
+      commentsList: [],
+      isCommentsShow: false
     }
   },
   async created () {
@@ -90,12 +84,15 @@ export default {
       method: 'get',
       url: '/'
     })
-    if (res.data.code === 200)
+    if (res.data.code === 0)
     {
       this.data = res.data.data.rows
       this.count = res.data.data.count
       this.pageNum = res.data.pageNum
       this.pages = Math.ceil(this.count / this.pageNum)
+    }
+    else {
+       this.$message.error(`${res.msg}`)
     }
   },
   methods: {
@@ -105,9 +102,13 @@ export default {
                page: e + 1
             }
        })
-       if (res.data.code === 200)
+       console.log(res.data)
+       if (res.data.code === 0)
         {
         this.data = res.data.data.rows
+        }
+        else {
+           this.$message.error(`${res.msg}`)
         }
       },
       toHome (){
@@ -122,17 +123,56 @@ export default {
           this.$message.success('已退出登录')
       },
      async like (e){
-          console.log(e.id, sessionStorage.getItem('uid'))
-           const res = await axios.post('/like', {
+       const { data: res } = await axios.post('/like', {
                uid: sessionStorage.getItem('uid'),
                commentId: e.id
        })
-       console.log(res)
-      /*  if (res.data.code === 200)
+       if (res.code === 0)
         {
-        this.data = res.data.data.rows
-        } */
-      }
+          this.data.forEach((item, index) => {
+              if (item.id === e.id)
+              {
+                  item.like_count++
+              }
+          })
+        }
+        else {
+             this.$message.error(`${res.msg}`)
+        }
+     },
+     publish (){
+         this.isPublish = true
+     },
+    async submit (){
+        this.isPublish = false
+        const { data: res } = await axios.post('/publish',
+        {
+            uid: sessionStorage.getItem('uid'),
+            title: this.myTitle,
+            value: this.myValue
+        })
+        if (res.code === 0)
+        {
+           this.data = res.data.rows
+        }
+        else
+        {
+          this.$message.error(`${res.msg}`)
+        }
+     },
+    async showComments (e){
+      const { data: res } = await axios.post('/showComments', {
+               commentId: e.id
+       })
+       if (res.code === 0)
+       {
+         this.commentsList = res.data
+         this.isCommentsShow = true
+       }
+       else {
+           this.$message.error(`${res.msg}`)
+       }
+     }
   }
 
 }

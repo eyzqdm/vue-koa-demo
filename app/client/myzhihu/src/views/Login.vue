@@ -4,8 +4,6 @@
       <div class="LoginRight">
         <div class="LoginTitle">知否 个人账号登陆</div>
         <div class="LoginForm">
-           <a-tabs default-active-key="1" >
-             <a-tab-pane key="1" tab="密码登录"><!-- 密码登录页面·-->
                 <a-form
                   id="components-form-demo-normal-login"
                   :form="form1"
@@ -35,43 +33,6 @@
                       </a-button>
                     </a-form-item>
                   </a-form>
-                </a-tab-pane>
-                <a-tab-pane key="2" tab="验证码登录" force-render ><!-- 验证码登陆页面·-->
-                    <a-form
-                    id="components-form-demo-normal-login"
-                    :form="form2"
-                    class="login-form">
-                    <a-form-item>
-                      <span>手机号</span>
-                      <a-input
-                      v-decorator="['phone', {rules: [{validator: checkphone}]}]"
-                      placeholder="请输入手机号"
-                      oninput="this.value = this.value.replace(/[^0-9]/g, '');">
-                      </a-input>
-                     </a-form-item>
-                     <a-form-item
-                        v-bind="formItemLayout">
-                        <span>验证码</span>
-                          <a-input-search
-                          :maxLength="6"
-                          type="text"
-                          v-decorator="['captcha', {rules: [{validator: checkcode, type:'number'}]}]"
-                          placeholder="请输入6位数字验证码"
-                          oninput="this.value = this.value.replace(/[^0-9]/g, '');"
-                           @search="getCaptcha">
-                          <a-button slot="enterButton" ref="Btn">
-                            {{btnTitle}}
-                          </a-button>
-                        </a-input-search>
-                    </a-form-item>
-                     <a-form-item>
-                      <a-button type="primary" html-type="submit" class="login-form-button" @click="CaptchaLogin">
-                          登陆
-                      </a-button>
-                     </a-form-item>
-                    </a-form>
-                </a-tab-pane>
-            </a-tabs>
         </div>
         <div class="LoginBottom">
           <span>还没有账号？</span>
@@ -124,56 +85,13 @@ export default {
       }
     },
     methods: {
-    checkphone (rule, value, callback) {
-      if (!value) {
-        return callback(new Error('请输入手机号'))
-      }
-      else {
-        var reg = /(?:^1[3456789]|^9[28])\d{9}$/
-        if (reg.test(value)) {
-          callback()
-          return true
-         }
-         else {
-          return callback(new Error('请输入正确的手机号'))
-        }
-      }
-    },
-    checkcode (rule, value, callback) {
-      if (!value) {
-        return callback(new Error('请输入验证码'))
-       }
-      else {
-        var reg = /^\d{6}$/
-        if (reg.test(value)) {
-          callback()
-        }
-        else {
-          return callback(new Error('请输入6位数字验证码'))
-        }
-      }
-    },
-    validateBtn (){
-        // 倒计时
-        this.$refs.Btn.disabled = true // 禁用按钮
-        let time = 60
-        const timer = setInterval(() => {
-        if (time === 0) {
-          clearInterval(timer)
-          this.$refs.Btn.disabled = false // 解除按钮禁用
-          this.btnTitle = '获取验证码'
-        } else {
-          this.btnTitle = time + '秒后重试'
-          time--
-        }
-      }, 1000)
-     },
   PasswordLogin (e){
       e.preventDefault()
        this.form1.validateFields(async (err, values) => {
         values.captcha = ''
           if (!err) {
           const { data: res } = await axios.post('/login', values)
+          console.log(res.msg)
             if (res.code === 0)
             {
               this.$message.success('登陆成功！')
@@ -184,7 +102,7 @@ export default {
               this.$router.push('/home')
             }
             else {
-              this.$message.error('登陆失败！')
+              this.$message.error(`${res.msg}`)
             }
           }
           else {
@@ -195,47 +113,6 @@ export default {
     ToRegister (){ // 跳转到注册页面
         this.$router.push('/register')
         },
-/*     getCaptcha (){
-        this.form2.validateFields(['phone'], { force: true }, async (err, values) => {
-            if (!err) {
-              const { data: res } = await Api.getCaptcha(values)
-              if (res.code === 200)
-              {
-                this.validateBtn() // 展示倒计时
-              }
-              else {
-                console.log(res.msg)
-              }
-            }
-            else {
-              console.log(err)
-            }
-          })
-        }, */
-   /*  CaptchaLogin (e){
-        e.preventDefault()
-          this.form2.validateFields(async (err, values) => {
-             values.password = ''
-            if (!err) {
-              const { data: res } = await Api.login(values)
-              if (res.code === 200)
-              {
-                this.$message.success('登陆成功！')
-                sessionStorage.setItem('token', res.data.access_token)
-                sessionStorage.setItem('avatarUrl', res.data.userInfo.avatarUrl)
-                sessionStorage.setItem('name', res.data.userInfo.nickName)
-                this.$router.push('/home')
-              }
-              else {
-                this.$error({
-                message: '错误',
-                description:
-                  res.msg
-                })
-              }
-            }
-          })
-        }, */
     onSearch (){
         }
       }
@@ -257,7 +134,7 @@ export default {
 }
 
 .LoginRight{
-    height: 500px;
+    height: 400px;
     width: 100%;
     float: right;
     position: relative;

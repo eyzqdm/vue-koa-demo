@@ -9,9 +9,7 @@ async function check(ctx, next) {
     } else {
         // 否则获取到token
         let token = await ctx.request.headers.authorization
-        console.log(ctx.request.headers.authorization)
-        if (token !== 'undefined') {
-
+        if (token !== 'null') {
             // 如果有token的话就开始解析
             const tokenItem = jwt.verify(token, 'token')
             // 将token的创建的时间和过期时间结构出来
@@ -24,16 +22,15 @@ async function check(ctx, next) {
                 await next()
             } else {
                 ctx.body = {
-                    status: 405,
-                    message:'token 已过期，请重新登陆'
+                    code: 3,
+                    data:'token 已过期，请重新登陆'
                 }  
             }
         }
         else {
-            console.log('sd爱的色放我·g')
             ctx.body = {
-                status: 405,
-                message:'请先登录'
+                code: 2,
+                msg:'请先登录'
             }  
         }
     }
