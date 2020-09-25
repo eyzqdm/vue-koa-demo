@@ -7,9 +7,9 @@ import axios from 'axios'
 import Antd, { Icon, Button, Modal, Upload, Result, notification, Progress, Card, Tabs, Form, Input, Layout, Menu, Spin } from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
 axios.defaults.baseURL = 'http://127.0.0.1'
-
 Vue.config.productionTip = false
-Vue.prototype.$error = notification.error
+Vue.prototype.$notification = notification
+Vue.prototype.error = notification.error
 axios.interceptors.request.use((config) => {
   // 拦截成功.
   console.log('拦截成功')

@@ -26,7 +26,6 @@
         gzip: true
     });
     let pageNum = 3;
-
     let users = await Models.Users.findAll();
    /*  let data = await Models.Users.findByPk(1, // 联合查询  查询当前用户，并查询该用户所有内容
         {
@@ -41,12 +40,10 @@
         let data = await Models.Contents.findAndCountAll({ //  查询所有评论以及所对应的的用户3
             limit:3, // 每页2条数据，从第几页开始
             offset,
-            include: {
-                model: Models.Users
-            }
+            include: { model: Models.Users}, // 必须定义了bolongsTo才可使用includes
         })
         ctx.body = {
-            code: 200,
+            code: 0,
             data,
             pageNum
         }
@@ -59,14 +56,14 @@
         {
             return ctx.body = {
                 code: 1,
-                data: '用户名和密码不能为空'
+                msg: '用户名和密码不能为空'
             }
         }
         if (password != repassword)
         {
             return ctx.body = {
                 code: 2,
-                data: '两次输入密码不一致'
+                msg: '两次输入密码不一致'
             }
         }
         let user = await Models.Users.findOne( // （查）
@@ -80,7 +77,7 @@
         {
             return ctx.body = {
                 code: 3,
-                data: '当前用户名已被注册'
+                msg: '当前用户名已被注册'
             }
         }
       let newUser =  await Models.Users.build({ // 新建模型对象实例 （增）
@@ -103,7 +100,7 @@
         {
             return ctx.body = {
                 code: 1,
-                data: '用户名和密码不能为空'
+                msg: '用户名和密码不能为空'
             }
         }
         let user = await Models.Users.findOne( // （查）
@@ -117,14 +114,14 @@
         {
             return ctx.body = {
                 code: 3,
-                data: '用户不存在'
+                msg: '用户不存在'
             }
         }
         if (user.get('password') !== md5(password))
         {
             return ctx.body = {
                 code: 2,
-                data: '密码错误'
+                msg: '密码错误'
             }
         }
        /*  ctx.cookies.set('id', user.get('id'), { // 设置cookie
@@ -176,7 +173,7 @@
         {
             return ctx.body = {
                 code: 1,
-                data: '你已经点过赞了'
+                msg: '你已经点过赞了'
             }
         }
         // 1 对相应的内容的like数量增加1
@@ -204,7 +201,7 @@
          {
             return ctx.body = {
                 code: 1,
-                data: '标题或内容不能为空'
+                msg: '标题或内容不能为空'
             }
          }
          await Models.Contents.build({
@@ -212,26 +209,34 @@
             title: ctx.request.body.title,
             content: ctx.request.body.value
          }).save();
+        let data = await Models.Contents.findAndCountAll({ //  查询所有评论以及所对应的的用户3
+            limit:3, // 每页2条数据，从第几页开始
+            offset:0,
+            include: { model: Models.Users}, // 必须定义了bolongsTo才可使用includes
+        })
          ctx.body = {
             code: 0,
-            msg: '发布成功'
+            msg: '发布成功',
+            data
          }
 
+         
     })
+    router.post('/showComments', async ctx => {
+       const data =  await Models.Comments.findAll({
+            where:{
+                content_id: ctx.request.body.commentId  
+            }
+        })
+        ctx.body = {
+           code: 0,
+           data
+        }
 
-
+        
+   })
     app.use( koaBodyParser() );
     app.use(router.routes()) // 挂载
-
-
-
-
-
-
-
-
-
-
     app.listen(80);
 
 })();

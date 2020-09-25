@@ -22,7 +22,7 @@ async function check(ctx, next) {
                 await next()
             } else {
                 ctx.body = {
-                    status: 3,
+                    code: 3,
                     data:'token 已过期，请重新登陆'
                 }  
             }
@@ -30,7 +30,7 @@ async function check(ctx, next) {
         else {
             ctx.body = {
                 code: 2,
-                data:'请先登录'
+                msg:'请先登录'
             }  
         }
     }

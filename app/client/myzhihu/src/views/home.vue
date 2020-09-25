@@ -12,12 +12,12 @@
         </div>
 
         <div class="heading text-right mb">
-            <span href="" @click.prevent = toHome()>登录</span>
+            <a-tag href="" @click.prevent = toHome()>登录</a-tag>
             <span> | </span>
-            <span href="" @click.prevent = toRegister()>注册</span>
+            <a-tag href="" @click.prevent = toRegister()>注册</a-tag>
             <span v-if="isLogin === true">
                 <span> | </span>
-                <span  href="" @click.prevent = exit()>退出登录</span>
+                <a-tag  href="" @click.prevent = exit()>退出登录</a-tag>
             </span>
         </div>
 
@@ -31,9 +31,9 @@
                 {{item.content}}
                 </p>
                 <footer class="text-right">
-                    <small @click = like(item)>赞{{item.like_count}}</small>
-                    <small>回复{{item.comment_count}}</small>
-                    <a href="">我要回复</a>
+                    <a-tag color="#2db7f5" @click = like(item)>赞{{item.like_count}}</a-tag>
+                    <a-tag color="#87d068" @click = showComments(item)>查看评论{{item.comment_count}}</a-tag>
+                    <a-tag color="#108ee9">我要评论</a-tag>
                 </footer>
             </div>
         </div>
@@ -44,13 +44,20 @@
             </li>
         </ul>
         <div>
-            <a-button @click="publish">发布内容</a-button>
+            <a-button type="primary" @click="publish">发布内容</a-button>
         </div>
          <a-modal v-model="isPublish" title="发布内容" @ok="submit" cancelText="取消" okText="确定">
            <div>标题</div>
            <div style="margin-bottom:10px"><a-input placeholder="请输入标题" v-model="myTitle" /></div>
            <div>内容</div>
            <a-textarea placeholder="请输入内容" :rows="4" v-model="myValue" />
+        </a-modal>
+        <a-modal v-model="isCommentsShow" title="所有评论"  :footer="null">
+            <div v-for="(item,index) in commentsList" :key = index>
+                <span>用户: {{item.user_id}}</span>
+                <span>{{item.content}}</span>
+            </div>
+            <a-button type="primary">我要评论</a-button>
         </a-modal>
     </div>
 </template>
@@ -66,7 +73,9 @@ export default {
       isLogin: false,
       isPublish: false,
       myValue: '',
-      myTitle: ''
+      myTitle: '',
+      commentsList: [],
+      isCommentsShow: false
     }
   },
   async created () {
@@ -75,12 +84,15 @@ export default {
       method: 'get',
       url: '/'
     })
-    if (res.data.code === 200)
+    if (res.data.code === 0)
     {
       this.data = res.data.data.rows
       this.count = res.data.data.count
       this.pageNum = res.data.pageNum
       this.pages = Math.ceil(this.count / this.pageNum)
+    }
+    else {
+       this.$message.error(`${res.msg}`)
     }
   },
   methods: {
@@ -90,9 +102,13 @@ export default {
                page: e + 1
             }
        })
-       if (res.data.code === 200)
+       console.log(res.data)
+       if (res.data.code === 0)
         {
         this.data = res.data.data.rows
+        }
+        else {
+           this.$message.error(`${res.msg}`)
         }
       },
       toHome (){
@@ -120,6 +136,9 @@ export default {
               }
           })
         }
+        else {
+             this.$message.error(`${res.msg}`)
+        }
      },
      publish (){
          this.isPublish = true
@@ -132,7 +151,27 @@ export default {
             title: this.myTitle,
             value: this.myValue
         })
-        console.log(res)
+        if (res.code === 0)
+        {
+           this.data = res.data.rows
+        }
+        else
+        {
+          this.$message.error(`${res.msg}`)
+        }
+     },
+    async showComments (e){
+      const { data: res } = await axios.post('/showComments', {
+               commentId: e.id
+       })
+       if (res.code === 0)
+       {
+         this.commentsList = res.data
+         this.isCommentsShow = true
+       }
+       else {
+           this.$message.error(`${res.msg}`)
+       }
      }
   }
 

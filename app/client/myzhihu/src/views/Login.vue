@@ -85,56 +85,13 @@ export default {
       }
     },
     methods: {
-    checkphone (rule, value, callback) {
-      if (!value) {
-        return callback(new Error('请输入手机号'))
-      }
-      else {
-        var reg = /(?:^1[3456789]|^9[28])\d{9}$/
-        if (reg.test(value)) {
-          callback()
-          return true
-         }
-         else {
-          return callback(new Error('请输入正确的手机号'))
-        }
-      }
-    },
-    checkcode (rule, value, callback) {
-      if (!value) {
-        return callback(new Error('请输入验证码'))
-       }
-      else {
-        var reg = /^\d{6}$/
-        if (reg.test(value)) {
-          callback()
-        }
-        else {
-          return callback(new Error('请输入6位数字验证码'))
-        }
-      }
-    },
-    validateBtn (){
-        // 倒计时
-        this.$refs.Btn.disabled = true // 禁用按钮
-        let time = 60
-        const timer = setInterval(() => {
-        if (time === 0) {
-          clearInterval(timer)
-          this.$refs.Btn.disabled = false // 解除按钮禁用
-          this.btnTitle = '获取验证码'
-        } else {
-          this.btnTitle = time + '秒后重试'
-          time--
-        }
-      }, 1000)
-     },
   PasswordLogin (e){
       e.preventDefault()
        this.form1.validateFields(async (err, values) => {
         values.captcha = ''
           if (!err) {
           const { data: res } = await axios.post('/login', values)
+          console.log(res.msg)
             if (res.code === 0)
             {
               this.$message.success('登陆成功！')
@@ -145,7 +102,7 @@ export default {
               this.$router.push('/home')
             }
             else {
-              this.$message.error('登陆失败！')
+              this.$message.error(`${res.msg}`)
             }
           }
           else {
@@ -156,47 +113,6 @@ export default {
     ToRegister (){ // 跳转到注册页面
         this.$router.push('/register')
         },
-/*     getCaptcha (){
-        this.form2.validateFields(['phone'], { force: true }, async (err, values) => {
-            if (!err) {
-              const { data: res } = await Api.getCaptcha(values)
-              if (res.code === 200)
-              {
-                this.validateBtn() // 展示倒计时
-              }
-              else {
-                console.log(res.msg)
-              }
-            }
-            else {
-              console.log(err)
-            }
-          })
-        }, */
-   /*  CaptchaLogin (e){
-        e.preventDefault()
-          this.form2.validateFields(async (err, values) => {
-             values.password = ''
-            if (!err) {
-              const { data: res } = await Api.login(values)
-              if (res.code === 200)
-              {
-                this.$message.success('登陆成功！')
-                sessionStorage.setItem('token', res.data.access_token)
-                sessionStorage.setItem('avatarUrl', res.data.userInfo.avatarUrl)
-                sessionStorage.setItem('name', res.data.userInfo.nickName)
-                this.$router.push('/home')
-              }
-              else {
-                this.$error({
-                message: '错误',
-                description:
-                  res.msg
-                })
-              }
-            }
-          })
-        }, */
     onSearch (){
         }
       }
@@ -218,7 +134,7 @@ export default {
 }
 
 .LoginRight{
-    height: 500px;
+    height: 400px;
     width: 100%;
     float: right;
     position: relative;
