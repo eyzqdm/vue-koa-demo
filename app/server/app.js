@@ -4,12 +4,12 @@
     const koaRouter = require('koa-router')
     const koaBodyParser = require('koa-bodyparser')
     const md5 = require('md5')
+    const Sequelize = require('sequelize')
     const app = new koa();
     const Models = require('./models/index') // 引入模型
     const router = koaRouter();
     const jwt = require('jsonwebtoken') // token
-    //const checkToken = require('./checkToken.js')
-    //app.use(checkToken)
+    const checkToken = require('./checkToken.js')
     app.use(async (ctx, next)=> {
         ctx.set('Access-Control-Allow-Origin', '*');
         ctx.set('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
@@ -20,11 +20,12 @@
           await next();
         }
       });
+    app.use(checkToken) // 验证token
     app.use(koaStaticCache('./public'), {
         prefix: 'public',
         gzip: true
     });
-    let pageNum = 2;
+    let pageNum = 3;
 
     let users = await Models.Users.findAll();
    /*  let data = await Models.Users.findByPk(1, // 联合查询  查询当前用户，并查询该用户所有内容
@@ -38,7 +39,7 @@
         let page = ctx.query.page || 1;
         let offset = (page - 1) * pageNum; // 处理分页
         let data = await Models.Contents.findAndCountAll({ //  查询所有评论以及所对应的的用户3
-            limit:2, // 每页2条数据，从第几页开始
+            limit:3, // 每页2条数据，从第几页开始
             offset,
             include: {
                 model: Models.Users
@@ -154,45 +155,67 @@
         
     })
     router.post('/like', async ctx => {
-        let url = ctx.url.split('?')[0]
-        let token = await ctx.request.headers.authorization
-        console.log(token)
-        if (token !== null) {
-
-            // 如果有token的话就开始解析
-            const tokenItem = jwt.verify(token, 'token')
-            // 将token的创建的时间和过期时间结构出来
-            const { time, timeout } = tokenItem
-            // 拿到当前的时间
-            let data = new Date().getTime();
-            // 判断一下如果当前时间减去token创建时间小于或者等于token过期时间，说明还没有过期，否则过期
-            if (data - time > timeout) {
-                return ctx.body = {
-                    status: 405,
-                    message:'token 已过期，请重新登陆'
-                }     
-            } 
-        }
-        else {
-            console.log('sd爱的色放我·g')
-            return ctx.body = {
-                status: 405,
-                message:'请先登录'
-                }  
-        
-            }
-
-
         let uid = ctx.request.body.uid
-        let commentId = ctx.request.body.commentId
-        let cookies = ctx.request.body.cookies
-        ctx.body = {
+        let Id = ctx.request.body.commentId
+        // 获取被点赞的内容
+        let content = await Models.Contents.findOne({
+            where:{
+                id: Id
+            }
+        }) 
+        // 联合查询，该用户是否对该内容点过赞
+        let like = await Models.Likes.findOne({
+            where: {
+                [Sequelize.Op.and]: [ // 且  // op模块处理各种运算关系
+                  {'content_id': Id},
+                  {'user_id': uid}
+                ]
+            }
+        })
+        if (like)
+        {
+            return ctx.body = {
+                code: 1,
+                data: '你已经点过赞了'
+            }
+        }
+        // 1 对相应的内容的like数量增加1
+        content.set('like_count', content.get('like_count') + 1)
+        await content.save() //存起来
+        // 2 点赞表里新增一条记录， 被点赞内容，点赞人
+        await Models.Likes.build({
+            content_id: Id,
+            user_id: uid
+        }).save();
+            ctx.body = {
             code: 0,
             data: {
-                msg: '点赞成功' 
+                msg: '点赞成功' ,
+                content
             }
         }
 
+
+    })
+    router.post('/publish', async ctx => {
+
+         console.log(ctx.request.body)
+         if (ctx.request.body.title === '' || ctx.request.body.value === '')
+         {
+            return ctx.body = {
+                code: 1,
+                data: '标题或内容不能为空'
+            }
+         }
+         await Models.Contents.build({
+            user_id: ctx.request.body.uid,
+            title: ctx.request.body.title,
+            content: ctx.request.body.value
+         }).save();
+         ctx.body = {
+            code: 0,
+            msg: '发布成功'
+         }
 
     })
 

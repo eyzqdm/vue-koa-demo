@@ -43,35 +43,17 @@
                 <span @click="change(index)" style="margin-left:15px">{{index + 1}}</span>
             </li>
         </ul>
-        <div class="modal" style="display: -block">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">xxxxxxxxxx</h5>
-                            <button type="button" class="close">
-                                <span>&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <!-- 回复 -->
-                            <form>
-                                <div class="form-group row">
-                                    <div class="col-md-12">
-                                        <textarea class="form-control" id="username" placeholder="回复内容……" cols="30" rows="10"></textarea>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary">回复</button>
-                            <button type="button" class="btn btn-secondary">取消</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div>
+            <a-button @click="publish">发布内容</a-button>
+        </div>
+         <a-modal v-model="isPublish" title="发布内容" @ok="submit" cancelText="取消" okText="确定">
+           <div>标题</div>
+           <div style="margin-bottom:10px"><a-input placeholder="请输入标题" v-model="myTitle" /></div>
+           <div>内容</div>
+           <a-textarea placeholder="请输入内容" :rows="4" v-model="myValue" />
+        </a-modal>
     </div>
 </template>
-
 <script>
 import axios from 'axios'
 export default {
@@ -79,9 +61,12 @@ export default {
     return {
       data: [],
       count: 0,
-      pageNum: 2,
+      pageNum: 3,
       pages: 0,
-      isLogin: false
+      isLogin: false,
+      isPublish: false,
+      myValue: '',
+      myTitle: ''
     }
   },
   async created () {
@@ -122,17 +107,33 @@ export default {
           this.$message.success('已退出登录')
       },
      async like (e){
-          console.log(e.id, sessionStorage.getItem('uid'))
-           const res = await axios.post('/like', {
+       const { data: res } = await axios.post('/like', {
                uid: sessionStorage.getItem('uid'),
                commentId: e.id
        })
-       console.log(res)
-      /*  if (res.data.code === 200)
+       if (res.code === 0)
         {
-        this.data = res.data.data.rows
-        } */
-      }
+          this.data.forEach((item, index) => {
+              if (item.id === e.id)
+              {
+                  item.like_count++
+              }
+          })
+        }
+     },
+     publish (){
+         this.isPublish = true
+     },
+    async submit (){
+        this.isPublish = false
+        const { data: res } = await axios.post('/publish',
+        {
+            uid: sessionStorage.getItem('uid'),
+            title: this.myTitle,
+            value: this.myValue
+        })
+        console.log(res)
+     }
   }
 
 }

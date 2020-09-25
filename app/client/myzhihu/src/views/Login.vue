@@ -4,8 +4,6 @@
       <div class="LoginRight">
         <div class="LoginTitle">知否 个人账号登陆</div>
         <div class="LoginForm">
-           <a-tabs default-active-key="1" >
-             <a-tab-pane key="1" tab="密码登录"><!-- 密码登录页面·-->
                 <a-form
                   id="components-form-demo-normal-login"
                   :form="form1"
@@ -35,43 +33,6 @@
                       </a-button>
                     </a-form-item>
                   </a-form>
-                </a-tab-pane>
-                <a-tab-pane key="2" tab="验证码登录" force-render ><!-- 验证码登陆页面·-->
-                    <a-form
-                    id="components-form-demo-normal-login"
-                    :form="form2"
-                    class="login-form">
-                    <a-form-item>
-                      <span>手机号</span>
-                      <a-input
-                      v-decorator="['phone', {rules: [{validator: checkphone}]}]"
-                      placeholder="请输入手机号"
-                      oninput="this.value = this.value.replace(/[^0-9]/g, '');">
-                      </a-input>
-                     </a-form-item>
-                     <a-form-item
-                        v-bind="formItemLayout">
-                        <span>验证码</span>
-                          <a-input-search
-                          :maxLength="6"
-                          type="text"
-                          v-decorator="['captcha', {rules: [{validator: checkcode, type:'number'}]}]"
-                          placeholder="请输入6位数字验证码"
-                          oninput="this.value = this.value.replace(/[^0-9]/g, '');"
-                           @search="getCaptcha">
-                          <a-button slot="enterButton" ref="Btn">
-                            {{btnTitle}}
-                          </a-button>
-                        </a-input-search>
-                    </a-form-item>
-                     <a-form-item>
-                      <a-button type="primary" html-type="submit" class="login-form-button" @click="CaptchaLogin">
-                          登陆
-                      </a-button>
-                     </a-form-item>
-                    </a-form>
-                </a-tab-pane>
-            </a-tabs>
         </div>
         <div class="LoginBottom">
           <span>还没有账号？</span>
