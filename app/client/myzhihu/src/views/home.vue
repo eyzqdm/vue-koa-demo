@@ -32,8 +32,8 @@
                 </p>
                 <footer class="text-right">
                     <a-tag color="#2db7f5" @click = like(item)>赞{{item.like_count}}</a-tag>
-                    <a-tag color="#87d068" @click = showComments(item)>查看评论{{item.comment_count}}</a-tag>
-                    <a-tag color="#108ee9">我要评论</a-tag>
+                    <a-tag color="#87d068" @click = showComments(item)>查看评论</a-tag>
+                    <a-tag color="#108ee9" @click= comments(item)>我要评论</a-tag>
                 </footer>
             </div>
         </div>
@@ -57,7 +57,9 @@
                 <span>用户: {{item.user_id}}</span>
                 <span>{{item.content}}</span>
             </div>
-            <a-button type="primary">我要评论</a-button>
+        </a-modal>
+         <a-modal v-model="commentsShow" title="评论" @ok="commentSubmit" cancelText="取消" okText="确定">
+           <a-textarea placeholder="请输入评论内容" :rows="4" v-model="myComment" />
         </a-modal>
     </div>
 </template>
@@ -75,7 +77,10 @@ export default {
       myValue: '',
       myTitle: '',
       commentsList: [],
-      isCommentsShow: false
+      isCommentsShow: false,
+      commentsShow: false,
+      myComment: '',
+      currentContent: 0
     }
   },
   async created () {
@@ -168,6 +173,25 @@ export default {
        {
          this.commentsList = res.data
          this.isCommentsShow = true
+       }
+       else {
+           this.$message.error(`${res.msg}`)
+       }
+     },
+     comments (e){
+         this.currentContent = e.id
+         this.commentsShow = true
+     },
+     async commentSubmit (){
+         this.commentsShow = false
+         const { data: res } = await axios.post('/comments', {
+               uid: sessionStorage.getItem('uid'),
+               contentId: this.currentContent,
+               content: this.myComment
+       })
+     if (res.code === 0)
+       {
+        this.$message.success('评论成功')
        }
        else {
            this.$message.error(`${res.msg}`)

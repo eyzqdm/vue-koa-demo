@@ -235,6 +235,32 @@
 
         
    })
+   router.post('/comments', async ctx => {
+     if (!ctx.request.body.content)
+     {
+         return ctx.body = {
+            code: 1,
+            msg: '评论内容不能为空'
+         }
+     }
+     let content = await Models.Contents.findOne({
+        where:{
+            id: ctx.request.body.contentId
+        }
+    })
+    await content.set('comment_count', content.get('comment_count') + 1)
+    await Models.Comments.build({
+        content_id:ctx.request.body.contentId,
+        user_id: ctx.request.body.uid,
+        content: ctx.request.body.content
+    }).save();
+     ctx.body = {
+        code: 0,
+        msg: '评论成功'
+     }
+
+     
+})
     app.use( koaBodyParser() );
     app.use(router.routes()) // 挂载
     app.listen(80);
