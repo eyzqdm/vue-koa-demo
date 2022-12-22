@@ -19,7 +19,7 @@
   "homepage": "https://github.com/guoqing19971002/vue-koa-demo#readme",
   "dependencies": {
     "@vue/cli": "^4.5.6",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "koa": "^2.13.0",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^9.4.0",
